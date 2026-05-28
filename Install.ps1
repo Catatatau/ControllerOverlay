@@ -17,6 +17,7 @@ try {
     # Habilita TLS 1.2
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Invoke-WebRequest -Uri $url -OutFile $tempZip -UseBasicParsing
+    Unblock-File -Path $tempZip -ErrorAction SilentlyContinue
 } catch {
     Write-Host "Erro: Não foi possivel baixar o arquivo. Certifique-se de que o GitHub Action gerou a release 'latest'." -ForegroundColor Red
     exit 1
@@ -33,6 +34,7 @@ if (-not (Test-Path -LiteralPath $sourceExe)) {
     Write-Host "Erro: O arquivo ControllerOverlay.exe não foi encontrado no ZIP." -ForegroundColor Red
     exit 1
 }
+Unblock-File -Path $sourceExe -ErrorAction SilentlyContinue
 
 Write-Host "Parando processos existentes..."
 Get-Process -Name $appName -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
