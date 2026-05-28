@@ -1,0 +1,36 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Publish
+      run: dotnet publish ControllerOverlay.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish_output
+
+    - name: Compress
+      run: Compress-Archive -Path publish_output\ControllerOverlay.exe -DestinationPath ControllerOverlay.zip
+
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: latest
+        name: "Latest Version"
+        body: "Build gerado automaticamente pelo GitHub Actions."
+        artifacts: "ControllerOverlay.zip"
+        allowUpdates: true
+        replacesArtifacts: true
+        token: ${{ secrets.GITHUB_TOKEN }}

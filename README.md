@@ -29,19 +29,13 @@ A standalone Windows executable controller overlay that displays Xbox, PlayStati
 - `Ctrl + Shift + C`: Open Settings Window
 
 ## Installer
-The latest local installer is generated at:
-
-```txt
-dist\ControllerOverlay-Setup-1.0.0.exe
-```
-
-It installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates Desktop and Start Menu shortcuts, and registers an uninstaller in Windows.
-
-To rebuild the installer:
+To install ControllerOverlay on any computer, run the following command in PowerShell:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
+irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/Install.ps1 | iex
 ```
+
+It downloads the latest release from GitHub, installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates Desktop and Start Menu shortcuts, and registers an uninstaller in Windows.
 
 ## Ball Speed Telemetry
 The overlay does not read or hook game memory. To show ball speed, provide a local TCP or WebSocket Stats API server on the configured port, default `49123`.
@@ -86,7 +80,4 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 ```
 The executable will be located in `bin\Release\net8.0-windows\win-x64\publish\`.
 
-Run the following command to generate the installer:
-```cmd
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File installer\build-installer.ps1
-```
+The project is configured to automatically build and create a new Release via GitHub Actions on every push to the `main` branch.
