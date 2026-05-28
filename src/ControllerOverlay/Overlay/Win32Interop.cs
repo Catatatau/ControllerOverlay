@@ -21,6 +21,10 @@ namespace ControllerOverlay.Overlay
 
         public const uint LWA_ALPHA = 0x00000002;
 
+        // Input APIs
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int vKey);
+
         // Hotkey APIs
         [DllImport("user32.dll")]
         public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);

@@ -21,6 +21,7 @@ namespace ControllerOverlay
         private FpsHudWindow? _fpsWindow;
         private RocketLeagueStatsApiService _gameStatsService = null!;
         private EtwGameFpsReader _etwFpsReader = null!;
+        private KeyboardMouseManager _kbmManager = null!;
 
         private DateTime _lastStatsUpdate = DateTime.MinValue;
         private int _activeStatsApiPort;
@@ -50,6 +51,10 @@ namespace ControllerOverlay
             _controllerManager.SetDeadzone(_settingsManager.CurrentSettings.Deadzone);
             _controllerManager.StateUpdated += ControllerManager_StateUpdated;
             _controllerManager.Start();
+
+            _kbmManager = new KeyboardMouseManager();
+            _kbmManager.StateUpdated += KeyboardMouseManager_StateUpdated;
+            _kbmManager.Start();
 
             ApplySettings();
         }
@@ -118,15 +123,39 @@ namespace ControllerOverlay
             });
         }
 
+        private void KeyboardMouseManager_StateUpdated()
+        {
+            var state = _kbmManager.CurrentState;
+            Dispatcher.InvokeAsync(() =>
+            {
+                KbmView.UpdateState(state);
+            });
+        }
+
         private void ApplySettings()
         {
             var settings = _settingsManager.CurrentSettings;
             Topmost = settings.AlwaysOnTop;
             Opacity = settings.Opacity;
-            Width = 270 * settings.Scale;
-            Height = 175 * settings.Scale;
             CtrlView.RenderTransform = new System.Windows.Media.ScaleTransform(settings.Scale, settings.Scale);
             CtrlView.ApplySettings(settings);
+            KbmView.RenderTransform = new System.Windows.Media.ScaleTransform(settings.Scale, settings.Scale);
+            KbmView.ApplySettings(settings);
+            if (settings.Layout == "Teclado/Mouse")
+            {
+                Width = 300 * settings.Scale;
+                Height = 180 * settings.Scale;
+                CtrlView.Visibility = Visibility.Collapsed;
+                KbmView.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Width = 270 * settings.Scale;
+                Height = 175 * settings.Scale;
+                CtrlView.Visibility = Visibility.Visible;
+                KbmView.Visibility = Visibility.Collapsed;
+            }
+
             _overlayBehavior.SetClickThrough(settings.ClickThrough);
             DebugText.Visibility = settings.DebugMode ? Visibility.Visible : Visibility.Collapsed;
 
@@ -312,6 +341,7 @@ namespace ControllerOverlay
         private void Window_Closed(object sender, EventArgs e)
         {
             _controllerManager?.Dispose();
+            _kbmManager?.Dispose();
             _hotkeyService?.Dispose();
             _gameStatsService?.Dispose();
             _etwFpsReader?.Dispose();

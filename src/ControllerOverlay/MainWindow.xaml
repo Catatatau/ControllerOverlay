@@ -10,6 +10,7 @@
         Closed="Window_Closed">
     <Grid>
         <local:ControllerView x:Name="CtrlView" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <local:KeyboardMouseView x:Name="KbmView" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
         
         <TextBlock x:Name="DebugText" Foreground="White" Background="#88000000" Padding="5"
                    HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed" />
