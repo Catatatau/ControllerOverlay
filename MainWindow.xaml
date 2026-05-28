@@ -1,0 +1,17 @@
+<Window x:Class="ControllerOverlay.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ControllerOverlay"
+        Title="Controller Overlay" Height="175" Width="270"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False"
+        MouseDown="Window_MouseDown"
+        Loaded="Window_Loaded"
+        Closed="Window_Closed">
+    <Grid>
+        <local:ControllerView x:Name="CtrlView" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        
+        <TextBlock x:Name="DebugText" Foreground="White" Background="#88000000" Padding="5"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed" />
+    </Grid>
+</Window>

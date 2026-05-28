@@ -1,0 +1,21 @@
+<Window x:Class="ControllerOverlay.FpsHudWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FPS HUD"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        SizeToContent="WidthAndHeight"
+        MouseDown="Window_MouseDown">
+    <Border x:Name="HudPanel" Background="#99000000" CornerRadius="4" Padding="8,6">
+        <StackPanel>
+            <TextBlock x:Name="FpsText" Text="FPS: N/D" Foreground="#E8EEF7"
+                       FontSize="13" FontWeight="Bold"/>
+            <TextBlock x:Name="BallSpeedText" Text="Bola: N/D" Foreground="#00FFCC"
+                       FontSize="13" FontWeight="Bold" Margin="0,3,0,0"/>
+        </StackPanel>
+    </Border>
+</Window>

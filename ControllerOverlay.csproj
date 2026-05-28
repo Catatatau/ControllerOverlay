@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.0</Version>
+    <Authors>CATATAU</Authors>
+    <Company>CATATAU</Company>
+    <Product>ControllerOverlay</Product>
+    <Description>Controller overlay with Rocket League FPS and ball speed HUD.</Description>
+    <RepositoryUrl>https://github.com/Catatatau/ControllerOverlay</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.21" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Vortice.DirectInput" Version="3.8.3" />
+    <PackageReference Include="Vortice.XInput" Version="3.8.3" />
+  </ItemGroup>
+
+</Project>

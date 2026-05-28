@@ -1,0 +1,13 @@
+bin/
+obj/
+dist/
+.vs/
+.idea/
+*.user
+*.suo
+*.log
+*.tmp
+*.pdb
+TestResults/
+*.nupkg
+*.snupkg
