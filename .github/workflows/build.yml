@@ -25,10 +25,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore src/ControllerOverlay/ControllerOverlay.csproj
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build src/ControllerOverlay/ControllerOverlay.csproj --configuration Release --no-restore
 
       - name: Build installer
         shell: pwsh

@@ -34,7 +34,7 @@
 To install **ControllerOverlay** on any computer, simply run the following command in PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/Install.ps1 | iex
+irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex
 ```
 
 > **Note:** This command automatically downloads the latest release from GitHub, installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates your shortcuts, and makes it easy to uninstall later.
