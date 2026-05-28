@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -13,6 +13,7 @@
     <Product>ControllerOverlay</Product>
     <Description>Controller overlay with Rocket League FPS and ball speed HUD.</Description>
     <RepositoryUrl>https://github.com/Catatatau/ControllerOverlay</RepositoryUrl>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
