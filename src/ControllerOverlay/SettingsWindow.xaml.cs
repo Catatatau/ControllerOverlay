@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Navigation;
 using ControllerOverlay.Settings;
 
@@ -28,8 +29,10 @@ namespace ControllerOverlay
             var s = _manager.CurrentSettings;
             
             SetComboText(CmbLayout, s.Layout);
+            SetComboText(CmbKeyboardPreset, s.KeyboardPreset);
             SetComboText(CmbTheme, s.Theme);
             TxtAccentColor.Text = s.AccentColor;
+            UpdateAccentPreview(s.AccentColor);
             SldScale.Value = s.Scale;
             SldOpacity.Value = s.Opacity;
             SldDeadzone.Value = s.Deadzone;
@@ -56,8 +59,10 @@ namespace ControllerOverlay
             var s = _manager.CurrentSettings;
             
             s.Layout = GetComboText(CmbLayout, s.Layout);
+            s.KeyboardPreset = GetComboText(CmbKeyboardPreset, s.KeyboardPreset);
             s.Theme = GetComboText(CmbTheme, s.Theme);
             s.AccentColor = TxtAccentColor.Text;
+            UpdateAccentPreview(s.AccentColor);
             s.Scale = SldScale.Value;
             s.Opacity = SldOpacity.Value;
             s.Deadzone = SldDeadzone.Value;
@@ -90,6 +95,32 @@ namespace ControllerOverlay
 
             _manager.Save();
             _mainWindow.ReloadSettings();
+        }
+
+        private void AccentColor_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.Tag is string hex)
+            {
+                TxtAccentColor.Text = hex;
+                UpdateAccentPreview(hex);
+            }
+        }
+
+        private void UpdateAccentPreview(string hex)
+        {
+            try
+            {
+                if (ColorConverter.ConvertFromString(hex) is Color color)
+                {
+                    AccentPreview.Background = new SolidColorBrush(color);
+                    return;
+                }
+            }
+            catch
+            {
+            }
+
+            AccentPreview.Background = Brushes.Transparent;
         }
 
         private static bool TryParseDouble(string value, out double result)

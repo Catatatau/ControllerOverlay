@@ -125,7 +125,7 @@ namespace ControllerOverlay
 
         private void KeyboardMouseManager_StateUpdated()
         {
-            var state = _kbmManager.CurrentState;
+            var state = _kbmManager.CurrentState.Snapshot();
             Dispatcher.InvokeAsync(() =>
             {
                 KbmView.UpdateState(state);
@@ -143,8 +143,8 @@ namespace ControllerOverlay
             KbmView.ApplySettings(settings);
             if (settings.Layout == "Teclado/Mouse")
             {
-                Width = 300 * settings.Scale;
-                Height = 180 * settings.Scale;
+                Width = (KbmView.OverlayWidth + 30) * settings.Scale;
+                Height = (KbmView.OverlayHeight + 30) * settings.Scale;
                 CtrlView.Visibility = Visibility.Collapsed;
                 KbmView.Visibility = Visibility.Visible;
             }
@@ -311,16 +311,13 @@ namespace ControllerOverlay
                 _settingsWindow = new SettingsWindow(_settingsManager, this);
                 _settingsWindow.Owner = this;
                 _settingsWindow.Topmost = true;
+                _settingsWindow.Closed += (_, _) => _settingsWindow = null;
                 _settingsWindow.Show();
             }
             else
             {
-                if (_settingsWindow.WindowState == WindowState.Minimized)
-                {
-                    _settingsWindow.WindowState = WindowState.Normal;
-                }
-
-                _settingsWindow.Activate();
+                _settingsWindow.Close();
+                _settingsWindow = null;
             }
         }
 

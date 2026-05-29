@@ -8,6 +8,7 @@ namespace ControllerOverlay.Settings
         public bool AlwaysOnTop { get; set; } = true;
         public string Theme { get; set; } = "Neon";
         public string Layout { get; set; } = "Auto"; // Auto, Xbox, PlayStation, Generic
+        public string KeyboardPreset { get; set; } = "FPS Compacto";
         public double Opacity { get; set; } = 1.0;
         public double Scale { get; set; } = 1.0;
         public double Deadzone { get; set; } = 0.08;

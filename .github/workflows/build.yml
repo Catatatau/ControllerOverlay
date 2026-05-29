@@ -30,18 +30,32 @@ jobs:
       - name: Build
         run: dotnet build src/ControllerOverlay/ControllerOverlay.csproj --configuration Release --no-restore
 
+      - name: Build installer
+        shell: pwsh
+        run: ./installer/build-installer.ps1
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ControllerOverlay-Setup
+          path: dist/ControllerOverlay-Setup-*.exe
+
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           name: ControllerOverlay ${{ github.ref_name }}
           body: |
-            Primeira release publica do ControllerOverlay.
+            Release publica do ControllerOverlay.
 
             Destaques:
             - Overlay de controle para Rocket League com layout Xbox/PlayStation.
+            - Modelos de teclado/mouse: FPS Compacto, WASD + Mouse, FPS Completo, Rocket League, Setas + Mouse e Numpad.
             - HUD separado para FPS e velocidade da bola.
             - Painel de configuracoes em Ctrl+Shift+C.
             - Opcoes para escala, transparencia, click-through e posicao do HUD.
             - Instalador Windows com atalhos e desinstalador.
+
+            Instalacao automatica:
+            irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex
           files: dist/ControllerOverlay-Setup-*.exe
