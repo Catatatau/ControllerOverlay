@@ -18,19 +18,24 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Publish
-      run: dotnet publish src/ControllerOverlay/ControllerOverlay.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish_output
+    - name: Restore
+      run: dotnet restore src/ControllerOverlay/ControllerOverlay.csproj
 
-    - name: Compress
-      run: Compress-Archive -Path publish_output\ControllerOverlay.exe -DestinationPath ControllerOverlay.zip
+    - name: Build installer
+      shell: pwsh
+      run: ./installer/build-installer.ps1
 
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
         tag: latest
         name: "Latest Version"
-        body: "Build gerado automaticamente pelo GitHub Actions."
-        artifacts: "ControllerOverlay.zip"
+        body: |
+          Build gerado automaticamente pelo GitHub Actions.
+
+          Instalacao automatica:
+          irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex
+        artifacts: "dist/ControllerOverlay-Setup-*.exe"
         allowUpdates: true
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
