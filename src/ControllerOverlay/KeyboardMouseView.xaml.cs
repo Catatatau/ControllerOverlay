@@ -210,6 +210,11 @@ namespace ControllerOverlay
                 {
                     string folder = Path.GetDirectoryName(file) ?? root;
                     string relative = Path.GetRelativePath(root, folder).Replace('\\', '/');
+                    if (relative == ".")
+                    {
+                        relative = Path.GetFileName(file);
+                    }
+
                     if (!string.IsNullOrWhiteSpace(relative) && relative != "." && seen.Add(relative))
                     {
                         yield return KeyboardPrefix + relative;
@@ -253,14 +258,16 @@ namespace ControllerOverlay
                 foreach (string relative in relativeCandidates)
                 {
                     string relativePath = relative.Replace('/', Path.DirectorySeparatorChar);
-                    string folder = Path.GetFullPath(Path.Combine(root, relativePath));
-                    if (!folder.Equals(rootFull, StringComparison.OrdinalIgnoreCase) &&
-                        !folder.StartsWith(rootFull + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                    bool pointsToKeyboardFile = relativePath.EndsWith(".json", StringComparison.OrdinalIgnoreCase);
+                    string keyboardPath = pointsToKeyboardFile
+                        ? Path.GetFullPath(Path.Combine(root, relativePath))
+                        : Path.Combine(Path.GetFullPath(Path.Combine(root, relativePath)), "keyboard.json");
+
+                    if (!keyboardPath.StartsWith(rootFull + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
 
-                    string keyboardPath = Path.Combine(folder, "keyboard.json");
                     if (!File.Exists(keyboardPath))
                     {
                         continue;
