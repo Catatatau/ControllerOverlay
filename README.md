@@ -1,101 +1,84 @@
-# ControllerOverlay
+Entendi. O problema é que tinha blocos de código dentro do README, aí o ChatGPT quebra visualmente. Agora vai em um único bloco real, usando ```` no começo e no final:
 
-ControllerOverlay is a lightweight Windows overlay for Rocket League and other games. It can show controller inputs, keyboard/mouse inputs, FPS, and ball speed in a movable transparent overlay.
-
-## Automatic Install
-
-Run this command in PowerShell:
-
+<div align="center">
+#  Controller Overlay for Rocket League
+*A standalone Windows executable controller overlay that displays Xbox, PlayStation, and generic controller inputs in real-time. Designed to be lightweight, modern, and transparent, sitting perfectly above Rocket League or any other game.*
+[![GitHub Release](https://img.shields.io/github/v/release/Catatatau/ControllerOverlay?style=for-the-badge&color=2ea44f)](https://github.com/Catatatau/ControllerOverlay/releases)
+[![Downloads](https://img.shields.io/github/downloads/Catatatau/ControllerOverlay/total?style=for-the-badge&color=blue)](https://github.com/Catatatau/ControllerOverlay/releases)
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+</div>
+---
+## ✨ Features
+- **Standalone `.exe`**: Portable and lightweight, requiring no installation dependencies.
+- **One-Click Installer**: Automatically sets up the app, adds shortcuts to your Desktop/Start Menu, and registers an uninstaller.
+- **Always on Top**: Works perfectly over games running in Borderless Windowed or Windowed mode.
+- **Click-Through Mode**: Play your game seamlessly without accidentally interacting with the overlay.
+- **Multi-Controller Support**: Native support for XInput (Xbox) and DirectInput (PlayStation DualShock/DualSense and Generic).
+- **Customizable UI**: Choose between Xbox and PlayStation layouts, adjust themes, scale, opacity, deadzone, and accent colors.
+- ⌨️ **Global Hotkeys**: Easily hide or tweak the overlay mid-game without alt-tabbing.
+- **HUD Metrics**: Optional FPS and ball speed readout.
+- **Smart Game FPS Source**: Reads game FPS from RTSS/RivaTuner shared memory when available, with ETW and local Stats API fallback.
+- ⚽ **Safe Ball Telemetry**: Ball speed can be received from a local TCP/WebSocket Stats API source without reading game memory.
+- ️ **Movable HUD**: Drag the FPS/ball speed panel freely when click-through is disabled.
+---
+## ⚡ Installation
+To install **ControllerOverlay** on any computer, simply run the following command in PowerShell:
 ```powershell
 irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex
 ```
-
-The script downloads the latest `ControllerOverlay-Setup-*.exe` from GitHub Releases, runs the installer, creates Desktop/Start Menu shortcuts, and registers an uninstaller in Windows.
-
-Manual download:
-
-```text
-https://github.com/Catatatau/ControllerOverlay/releases/latest
-```
-
-## Features
-
-- Xbox and PlayStation controller overlay.
-- Keyboard/mouse overlay with multiple presets.
-- FPS HUD from RTSS, ETW, or local Stats API fallback.
-- Ball speed HUD from local TCP/WebSocket Stats API.
-- Movable FPS/ball speed HUD with optional transparent background.
-- Click-through mode for playing without interacting with the overlay.
-- Settings panel with `Ctrl + Shift + C`.
-- Show/hide overlay with `Ctrl + Shift + O`.
-
-## Keyboard/Mouse Presets
-
-The app includes the original NohBoard keyboard preset folders in `src/ControllerOverlay/keyboards/NohBoard`, and the installer extracts them to the installed app. You can add more models by opening the settings panel and clicking `Pasta` next to `Modelo teclado`.
-
-Custom keyboard models go in:
-
-```text
-%APPDATA%\ControllerOverlay\keyboards
-```
-
-Each model folder needs a `keyboard.json` file using the NohBoard layout format.
-
-Built-in compact presets:
-
-- `FPS Compacto`: compact Q/W/E/R, A/S/D/F, Shift/Ctrl/Space, and mouse buttons.
-- `WASD + Mouse`: minimal movement keys plus mouse buttons.
-- `FPS Completo`: number row, FPS keys, modifiers, space, and mouse buttons.
-- `Rocket League`: useful Rocket League keyboard controls in a compact shape.
-- `Setas + Mouse`: arrow key layout with mouse buttons.
-- `Numpad`: numeric keypad layout.
-
-Bundled NohBoard presets appear in the menu as `Teclado: NohBoard/...`.
-
-To use them:
-
-1. Open settings with `Ctrl + Shift + C`.
-2. Set `Modelo` to `Teclado/Mouse`.
-3. Choose a preset in `Modelo teclado`.
-
-NohBoard presets and layout data are included with their GPL v2 license in the bundled `keyboards/NohBoard` folder.
-
-## Rocket League Setup
-
-1. Open Rocket League.
-2. Use Borderless or Windowed mode.
-3. Start ControllerOverlay.
-4. Move the overlay where you want it.
-5. Use `Ctrl + Shift + C` to open settings.
-
-Exclusive fullscreen can prevent external overlays from appearing above the game.
-
-## Stats API
-
-The overlay does not hook or edit Rocket League memory. Ball speed can come from a local TCP/WebSocket Stats API on the configured port, default `49123`.
-
-Example payload:
-
+> **Note:** This command automatically downloads the latest release from GitHub, installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates your shortcuts, and makes it easy to uninstall later.
+---
+## ️ How to Use with Rocket League
+1. Launch **Rocket League**.
+2. Go to **Settings -> Video** and set your Display Mode to **Borderless** or **Windowed**. *(Exclusive Fullscreen prevents external overlays from rendering on top).*
+3. Run `ControllerOverlay.exe` from your Desktop.
+4. Connect your controller (hot-plugging is fully supported).
+5. Position the overlay where you like it by clicking and dragging (make sure "Lock Position" is off).
+6. Press `Ctrl + Shift + C` to open the settings panel and customize your experience.
+7. Enjoy!
+---
+## ⌨️ Default Hotkeys
+| Shortcut | Action |
+| --- | --- |
+| `Ctrl + Shift + O` | ️ Show/Hide Overlay |
+| `Ctrl + Shift + C` | ⚙️ Open Settings Window |
+---
+## ⚙️ Settings & Configuration
+Settings are automatically saved to your `%APPDATA%\ControllerOverlay\settings.json` file.
+- **Theme / Layout**: Swap between Xbox (A, B, X, Y) and PlayStation (Cross, Circle, Square, Triangle).
+- **Stick Deadzone**: Adjust the analog stick sensitivity. Default is `0.08`.
+- **Lock Position**: Prevents accidentally dragging the overlay.
+---
+##  Advanced: Telemetry & FPS
+### Ball Speed Telemetry
+The overlay does not read or hook game memory. To show ball speed, provide a local TCP or WebSocket Stats API server on the configured port (default `49123`).
+Supported payload format:
 ```json
-{"Event":"UpdateState","Data":{"Game":{"BallSpeed":123.4,"FPS":65}}}
+{"Event":"UpdateState","Data":{"Game":{"BallSpeed":123.4}}}
 ```
-
-## Development
-
-Build:
-
-```powershell
-dotnet build src/ControllerOverlay/ControllerOverlay.csproj -c Release
+### Game FPS
+For accurate game FPS tracking, run **RTSS/RivaTuner Statistics Server**. The overlay reads RTSS shared memory natively. As a fallback, it will use ETW (requires running as administrator) or the local Stats API.
+Supported Stats API payload format for FPS:
+```json
+{"Event":"UpdateState","Data":{"Game":{"FPS":65}}}
 ```
-
-Build installer:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
+---
+## ❓ Troubleshooting & Anti-Cheat
+- **Is this a cheat?**
+**No.** This app only reads physical controller inputs from Windows natively using `XInput` and `DirectInput`. It does **not** hook into game memory, read game files, or interact with Rocket League in any way. It is completely safe to use.
+- **My controller is not detected:**
+If you are using a PlayStation controller, ensure it's recognized by Windows. If it acts erratically, using [DS4Windows](https://ds4-windows.com/) will provide perfect XInput translation.
+- **I can't click the settings gear:**
+If "Click-Through" is enabled, you cannot click the overlay. Use `Ctrl + Shift + C` to open settings and disable click-through.
+---
+## ️ Build Instructions (Developers)
+Requires **.NET 8.0 SDK**. Run the following command to generate a portable standalone executable:
+```cmd
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
 ```
-
-The installer is generated in:
-
-```text
-dist\ControllerOverlay-Setup-1.2.0.exe
-```
+> *The project is configured to automatically build and create a new Release via GitHub Actions on every push to the `main` branch.*
+<div align="center">
+<br/>
+Made with ❤️ by Catatau
+</div>
