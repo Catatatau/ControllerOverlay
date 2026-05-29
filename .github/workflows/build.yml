@@ -50,7 +50,9 @@ jobs:
 
             Destaques:
             - Overlay de controle para Rocket League com layout Xbox/PlayStation.
-            - Modelos de teclado/mouse: FPS Compacto, WASD + Mouse, FPS Completo, Rocket League, Setas + Mouse e Numpad.
+            - Modelos de teclado/mouse compactos e presets NohBoard embarcados no instalador.
+            - Pasta do usuario para adicionar novos modelos keyboard.json.
+            - Roda de cores livre para escolher qualquer cor do overlay.
             - HUD separado para FPS e velocidade da bola.
             - Painel de configuracoes em Ctrl+Shift+C.
             - Opcoes para escala, transparencia, click-through e posicao do HUD.

@@ -21,6 +21,31 @@ Get-Process -Name $appName -ErrorAction SilentlyContinue | Stop-Process -Force -
 New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 Copy-Item -LiteralPath $sourceExe -Destination $targetExe -Force
 
+$sourceKeyboardsZip = Join-Path $SourceDir 'keyboards.zip'
+$targetKeyboardsDir = Join-Path $InstallDir 'keyboards'
+if (Test-Path -LiteralPath $sourceKeyboardsZip) {
+    $targetNohBoardDir = Join-Path $targetKeyboardsDir 'NohBoard'
+    if (Test-Path -LiteralPath $targetNohBoardDir) {
+        Remove-Item -LiteralPath $targetNohBoardDir -Recurse -Force
+    }
+
+    New-Item -ItemType Directory -Path $targetKeyboardsDir -Force | Out-Null
+    Expand-Archive -LiteralPath $sourceKeyboardsZip -DestinationPath $targetKeyboardsDir -Force
+}
+
+$userKeyboardsDir = Join-Path $env:APPDATA 'ControllerOverlay\keyboards'
+New-Item -ItemType Directory -Path $userKeyboardsDir -Force | Out-Null
+$userKeyboardsReadme = Join-Path $userKeyboardsDir 'README.txt'
+if (-not (Test-Path -LiteralPath $userKeyboardsReadme)) {
+    @'
+Coloque aqui pastas de teclado no formato NohBoard.
+Cada modelo precisa ter um arquivo keyboard.json.
+
+Exemplo:
+%APPDATA%\ControllerOverlay\keyboards\MeuModelo\keyboard.json
+'@ | Set-Content -LiteralPath $userKeyboardsReadme -Encoding UTF8
+}
+
 $uninstallPath = Join-Path $InstallDir 'Uninstall-ControllerOverlay.ps1'
 $uninstallScript = @'
 $ErrorActionPreference = 'SilentlyContinue'
@@ -81,7 +106,7 @@ New-Item -Path $uninstallKey -Force | Out-Null
 $estimatedSizeKb = [int][Math]::Ceiling((Get-Item -LiteralPath $targetExe).Length / 1KB)
 
 New-ItemProperty -Path $uninstallKey -Name 'DisplayName' -Value 'ControllerOverlay' -PropertyType String -Force | Out-Null
-New-ItemProperty -Path $uninstallKey -Name 'DisplayVersion' -Value '1.1.0' -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $uninstallKey -Name 'DisplayVersion' -Value '1.2.0' -PropertyType String -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'Publisher' -Value 'CATATAU' -PropertyType String -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'URLInfoAbout' -Value 'https://github.com/Catatatau/ControllerOverlay' -PropertyType String -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'InstallLocation' -Value $InstallDir -PropertyType String -Force | Out-Null

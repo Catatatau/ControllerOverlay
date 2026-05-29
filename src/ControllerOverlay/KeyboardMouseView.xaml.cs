@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using ControllerOverlay.Input;
 using ControllerOverlay.Settings;
+using Newtonsoft.Json.Linq;
 
 namespace ControllerOverlay
 {
@@ -18,6 +21,8 @@ namespace ControllerOverlay
         private SolidColorBrush _outlineBrush = new(Color.FromRgb(232, 238, 247));
         private SolidColorBrush _textBrush = new(Color.FromRgb(232, 238, 247));
         private string _currentPreset = string.Empty;
+        private const string KeyboardPrefix = "Teclado: ";
+        private const string LegacyNohBoardPrefix = "NohBoard: ";
 
         public double OverlayWidth { get; private set; } = 270;
         public double OverlayHeight { get; private set; } = 150;
@@ -26,6 +31,43 @@ namespace ControllerOverlay
         {
             InitializeComponent();
             BuildPreset("FPS Compacto");
+        }
+
+        public static IReadOnlyList<string> GetAvailablePresetNames()
+        {
+            var names = new List<string>
+            {
+                "FPS Compacto",
+                "WASD + Mouse",
+                "FPS Completo",
+                "Rocket League",
+                "Setas + Mouse",
+                "Numpad"
+            };
+
+            names.AddRange(DiscoverKeyboardPresets());
+            return names;
+        }
+
+        public static string GetUserKeyboardFolder()
+        {
+            string root = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ControllerOverlay",
+                "keyboards");
+
+            Directory.CreateDirectory(root);
+
+            string readmePath = Path.Combine(root, "README.txt");
+            if (!File.Exists(readmePath))
+            {
+                File.WriteAllText(
+                    readmePath,
+                    "Coloque aqui pastas de teclado no formato NohBoard. Cada modelo precisa ter um arquivo keyboard.json.\r\n" +
+                    "Exemplo: %APPDATA%\\ControllerOverlay\\keyboards\\MeuModelo\\keyboard.json\r\n");
+            }
+
+            return root;
         }
 
         public void ApplySettings(AppSettings settings)
@@ -76,7 +118,7 @@ namespace ControllerOverlay
                 return;
             }
 
-            KeyboardPreset preset = normalized switch
+            KeyboardPreset preset = TryLoadKeyboardPreset(normalized) ?? (normalized switch
             {
                 "WASD + Mouse" => WasdMousePreset(),
                 "FPS Completo" => FullFpsPreset(),
@@ -84,7 +126,7 @@ namespace ControllerOverlay
                 "Setas + Mouse" => ArrowsMousePreset(),
                 "Numpad" => NumpadPreset(),
                 _ => CompactFpsPreset()
-            };
+            });
 
             _currentPreset = preset.Name;
             OverlayWidth = preset.Width;
@@ -134,6 +176,12 @@ namespace ControllerOverlay
         private static string NormalizePreset(string? preset)
         {
             string value = string.IsNullOrWhiteSpace(preset) ? "FPS Compacto" : preset.Trim();
+            if (value.StartsWith(KeyboardPrefix, StringComparison.OrdinalIgnoreCase) ||
+                value.StartsWith(LegacyNohBoardPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return value;
+            }
+
             return value.ToLowerInvariant() switch
             {
                 "compact" or "compacto" or "fps compacto" => "FPS Compacto",
@@ -144,6 +192,222 @@ namespace ControllerOverlay
                 "numpad" or "numerico" or "teclado numerico" => "Numpad",
                 _ => "FPS Compacto"
             };
+        }
+
+        private static IEnumerable<string> DiscoverKeyboardPresets()
+        {
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (string root in GetKeyboardRoots(includeLegacyNohBoardDownload: false))
+            {
+                if (!Directory.Exists(root))
+                {
+                    continue;
+                }
+
+                foreach (string file in Directory.EnumerateFiles(root, "keyboard.json", SearchOption.AllDirectories)
+                             .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
+                {
+                    string folder = Path.GetDirectoryName(file) ?? root;
+                    string relative = Path.GetRelativePath(root, folder).Replace('\\', '/');
+                    if (!string.IsNullOrWhiteSpace(relative) && relative != "." && seen.Add(relative))
+                    {
+                        yield return KeyboardPrefix + relative;
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<string> GetKeyboardRoots(bool includeLegacyNohBoardDownload)
+        {
+            yield return GetUserKeyboardFolder();
+            yield return Path.Combine(AppContext.BaseDirectory, "keyboards");
+
+            if (includeLegacyNohBoardDownload)
+            {
+                yield return GetLegacyNohBoardKeyboardRoot();
+            }
+        }
+
+        private static string GetLegacyNohBoardKeyboardRoot()
+        {
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                "Downloads",
+                "NohBoard-1.3.0",
+                "NohBoard-1.3.0",
+                "keyboards");
+        }
+
+        private static KeyboardPreset? TryLoadKeyboardPreset(string presetName)
+        {
+            IReadOnlyList<string> relativeCandidates = GetPresetRelativeCandidates(presetName);
+            if (relativeCandidates.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (string root in GetKeyboardRoots(includeLegacyNohBoardDownload: true))
+            {
+                string rootFull = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                foreach (string relative in relativeCandidates)
+                {
+                    string relativePath = relative.Replace('/', Path.DirectorySeparatorChar);
+                    string folder = Path.GetFullPath(Path.Combine(root, relativePath));
+                    if (!folder.Equals(rootFull, StringComparison.OrdinalIgnoreCase) &&
+                        !folder.StartsWith(rootFull + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    string keyboardPath = Path.Combine(folder, "keyboard.json");
+                    if (!File.Exists(keyboardPath))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        JObject json = JObject.Parse(File.ReadAllText(keyboardPath));
+                        var keys = new List<KeySpec>();
+                        foreach (JToken element in json["Elements"]?.Children() ?? Enumerable.Empty<JToken>())
+                        {
+                            KeySpec? spec = ConvertNohBoardElement(element);
+                            if (spec != null)
+                            {
+                                keys.Add(spec);
+                            }
+                        }
+
+                        if (keys.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        double width = GetNumber(json["Width"]) ?? Math.Ceiling(keys.Max(k => k.X + k.Width) + 8);
+                        double height = GetNumber(json["Height"]) ?? Math.Ceiling(keys.Max(k => k.Y + k.Height) + 8);
+                        return new KeyboardPreset(presetName, width, height, keys);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static IReadOnlyList<string> GetPresetRelativeCandidates(string presetName)
+        {
+            string? relative = null;
+            bool legacyNohBoard = false;
+
+            if (presetName.StartsWith(KeyboardPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                relative = presetName[KeyboardPrefix.Length..].Trim();
+            }
+            else if (presetName.StartsWith(LegacyNohBoardPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                relative = presetName[LegacyNohBoardPrefix.Length..].Trim();
+                legacyNohBoard = true;
+            }
+
+            if (string.IsNullOrWhiteSpace(relative))
+            {
+                return Array.Empty<string>();
+            }
+
+            relative = relative.Replace('\\', '/').Trim('/');
+            var candidates = new List<string> { relative };
+
+            if (legacyNohBoard && !relative.StartsWith("NohBoard/", StringComparison.OrdinalIgnoreCase))
+            {
+                candidates.Insert(0, "NohBoard/" + relative);
+            }
+
+            return candidates;
+        }
+
+        private static KeySpec? ConvertNohBoardElement(JToken element)
+        {
+            string type = element["__type"]?.ToString() ?? string.Empty;
+            if (!string.Equals(type, "KeyboardKey", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(type, "MouseKey", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            List<JToken> boundaries = (element["Boundaries"]?.Children() ?? Enumerable.Empty<JToken>()).ToList();
+            if (boundaries.Count == 0)
+            {
+                return null;
+            }
+
+            double minX = boundaries.Min(point => GetNumber(point["X"]) ?? 0);
+            double minY = boundaries.Min(point => GetNumber(point["Y"]) ?? 0);
+            double maxX = boundaries.Max(point => GetNumber(point["X"]) ?? 0);
+            double maxY = boundaries.Max(point => GetNumber(point["Y"]) ?? 0);
+            double width = Math.Max(8, maxX - minX);
+            double height = Math.Max(8, maxY - minY);
+
+            bool isMouse = string.Equals(type, "MouseKey", StringComparison.OrdinalIgnoreCase);
+            string label = element["Text"]?.ToString() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                label = width > 70 ? "Space" : string.Empty;
+            }
+
+            var virtualKeys = new List<int>();
+            foreach (JToken code in element["KeyCodes"]?.Children() ?? Enumerable.Empty<JToken>())
+            {
+                int? parsed = GetInt(code);
+                if (!parsed.HasValue)
+                {
+                    continue;
+                }
+
+                virtualKeys.Add(isMouse ? MapNohBoardMouseCode(parsed.Value) : parsed.Value);
+            }
+
+            if (virtualKeys.Count == 0)
+            {
+                return null;
+            }
+
+            double fontSize = label.Length > 5 ? 9.5 : label.Length > 3 ? 10.5 : 12;
+            return new KeySpec(label, virtualKeys, minX, minY, width, height, fontSize, isMouse);
+        }
+
+        private static int MapNohBoardMouseCode(int mouseCode)
+        {
+            return mouseCode switch
+            {
+                0 => Vk.LButton,
+                1 => Vk.RButton,
+                2 => Vk.MButton,
+                3 => Vk.XButton1,
+                4 => Vk.XButton2,
+                _ => mouseCode
+            };
+        }
+
+        private static double? GetNumber(JToken? token)
+        {
+            return token == null
+                ? null
+                : double.TryParse(token.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double value)
+                    ? value
+                    : null;
+        }
+
+        private static int? GetInt(JToken? token)
+        {
+            return token == null
+                ? null
+                : int.TryParse(token.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int value)
+                    ? value
+                    : null;
         }
 
         private static SolidColorBrush TryMakeBrush(string hex, Color fallback)

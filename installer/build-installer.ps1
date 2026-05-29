@@ -2,7 +2,7 @@
 param(
     [string]$Configuration = 'Release',
     [string]$Runtime = 'win-x64',
-    [string]$Version = '1.1.0'
+    [string]$Version = '1.2.0'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -47,6 +47,14 @@ Get-ChildItem -LiteralPath $payloadDir -File |
     Where-Object { $_.Name -ne 'ControllerOverlay.exe' } |
     Remove-Item -Force
 
+$keyboardsSource = Join-Path (Split-Path -Parent $projectPath) 'keyboards'
+$keyboardsZip = Join-Path $payloadDir 'keyboards.zip'
+if (-not (Test-Path -LiteralPath $keyboardsSource)) {
+    throw "Keyboard preset source folder was not found at $keyboardsSource"
+}
+
+Compress-Archive -Path (Join-Path $keyboardsSource '*') -DestinationPath $keyboardsZip -Force
+
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install.ps1') -Destination (Join-Path $payloadDir 'install.ps1') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install.cmd') -Destination (Join-Path $payloadDir 'install.cmd') -Force
 
@@ -85,6 +93,7 @@ SourceFiles=SourceFiles
 FILE0="install.cmd"
 FILE1="install.ps1"
 FILE2="ControllerOverlay.exe"
+FILE3="keyboards.zip"
 
 [SourceFiles]
 SourceFiles0=$payloadWithSlash
@@ -93,6 +102,7 @@ SourceFiles0=$payloadWithSlash
 %FILE0%=
 %FILE1%=
 %FILE2%=
+%FILE3%=
 "@
 
 Set-Content -LiteralPath $sedPath -Value $sed -Encoding ASCII

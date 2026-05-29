@@ -31,9 +31,17 @@ https://github.com/Catatatau/ControllerOverlay/releases/latest
 
 ## Keyboard/Mouse Presets
 
-The keyboard overlay is inspired by the selectable-layout idea from NohBoard, but the presets are implemented directly in this app.
+The app includes the original NohBoard keyboard preset folders in `src/ControllerOverlay/keyboards/NohBoard`, and the installer extracts them to the installed app. You can add more models by opening the settings panel and clicking `Pasta` next to `Modelo teclado`.
 
-Available presets:
+Custom keyboard models go in:
+
+```text
+%APPDATA%\ControllerOverlay\keyboards
+```
+
+Each model folder needs a `keyboard.json` file using the NohBoard layout format.
+
+Built-in compact presets:
 
 - `FPS Compacto`: compact Q/W/E/R, A/S/D/F, Shift/Ctrl/Space, and mouse buttons.
 - `WASD + Mouse`: minimal movement keys plus mouse buttons.
@@ -42,11 +50,15 @@ Available presets:
 - `Setas + Mouse`: arrow key layout with mouse buttons.
 - `Numpad`: numeric keypad layout.
 
+Bundled NohBoard presets appear in the menu as `Teclado: NohBoard/...`.
+
 To use them:
 
 1. Open settings with `Ctrl + Shift + C`.
 2. Set `Modelo` to `Teclado/Mouse`.
 3. Choose a preset in `Modelo teclado`.
+
+NohBoard presets and layout data are included with their GPL v2 license in the bundled `keyboards/NohBoard` folder.
 
 ## Rocket League Setup
 
@@ -85,5 +97,5 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-instal
 The installer is generated in:
 
 ```text
-dist\ControllerOverlay-Setup-1.1.0.exe
+dist\ControllerOverlay-Setup-1.2.0.exe
 ```

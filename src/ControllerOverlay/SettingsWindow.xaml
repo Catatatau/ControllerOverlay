@@ -81,6 +81,15 @@
             <Setter Property="Margin" Value="0,7,0,0"/>
         </Style>
 
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#2200FFCC"/>
+            <Setter Property="Foreground" Value="#EAFDF8"/>
+            <Setter Property="BorderBrush" Value="#7700FFCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
         <Style TargetType="Slider">
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -89,24 +98,6 @@
             <Setter Property="Foreground" Value="#00FFCC"/>
         </Style>
 
-        <Style x:Key="ColorSwatchButton" TargetType="Button">
-            <Setter Property="Width" Value="30"/>
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="0,0,8,8"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="Transparent">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Grid>
@@ -173,19 +164,24 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="145"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="76"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel>
                                 <TextBlock Text="Modelo teclado" Style="{StaticResource FieldLabel}"/>
                                 <TextBlock Text="Usado quando Modelo = Teclado/Mouse" Style="{StaticResource HintText}" Margin="0,3,0,0"/>
                             </StackPanel>
-                            <ComboBox x:Name="CmbKeyboardPreset" Grid.Column="1" SelectionChanged="Setting_Changed">
-                                <ComboBoxItem Content="FPS Compacto" />
-                                <ComboBoxItem Content="WASD + Mouse" />
-                                <ComboBoxItem Content="FPS Completo" />
-                                <ComboBoxItem Content="Rocket League" />
-                                <ComboBoxItem Content="Setas + Mouse" />
-                                <ComboBoxItem Content="Numpad" />
+                            <ComboBox x:Name="CmbKeyboardPreset"
+                                      Grid.Column="1"
+                                      Margin="0,0,8,0"
+                                      DropDownOpened="CmbKeyboardPreset_DropDownOpened"
+                                      SelectionChanged="Setting_Changed">
                             </ComboBox>
+                            <Button Grid.Column="2"
+                                    Content="Pasta"
+                                    Height="32"
+                                    Padding="10,0"
+                                    ToolTip="Abrir pasta para adicionar modelos keyboard.json"
+                                    Click="OpenKeyboardFolder_Click"/>
                         </Grid>
 
                         <Grid Style="{StaticResource FieldRow}">
@@ -244,38 +240,31 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Cor destaque" Style="{StaticResource FieldLabel}"/>
                             <StackPanel Grid.Column="1">
-                                <WrapPanel>
-                                    <Button Tag="#00FFCC" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#00FFCC" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#00A2FF" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#00A2FF" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#004DFF" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#004DFF" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#7C3AED" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#7C3AED" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#C77DFF" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#C77DFF" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#F1C40F" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#F1C40F" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#FF7A00" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#FF7A00" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#D9192E" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#D9192E" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#00B83F" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#00B83F" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                    <Button Tag="#E8EEF7" Click="AccentColor_Click" Style="{StaticResource ColorSwatchButton}">
-                                        <Ellipse Width="24" Height="24" Fill="#E8EEF7" Stroke="#E8EEF7" StrokeThickness="1.5"/>
-                                    </Button>
-                                </WrapPanel>
+                                <Border Width="190"
+                                        Height="190"
+                                        HorizontalAlignment="Left"
+                                        Background="#22000000"
+                                        BorderBrush="#44FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="95"
+                                        Padding="5">
+                                    <Image x:Name="ColorWheelImage"
+                                           Width="180"
+                                           Height="180"
+                                           Stretch="None"
+                                           Cursor="Cross"
+                                           MouseDown="ColorWheel_MouseDown"
+                                           MouseMove="ColorWheel_MouseMove"
+                                           MouseUp="ColorWheel_MouseUp"/>
+                                </Border>
+
+                                <TextBlock Text="Brilho" Style="{StaticResource HintText}" Margin="0,8,0,3"/>
+                                <Slider x:Name="SldColorValue"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        Value="1"
+                                        TickFrequency="0.01"
+                                        ValueChanged="ColorValue_Changed"/>
 
                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                                     <Border x:Name="AccentPreview"
