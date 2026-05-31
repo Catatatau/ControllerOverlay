@@ -37,7 +37,21 @@ To install **ControllerOverlay** on any computer, simply run the following comma
 irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex
 ```
 
-> **Note:** This command automatically downloads the latest release from GitHub, installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates your shortcuts, and makes it easy to uninstall later.
+Or from CMD:
+
+```cmd
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex"
+```
+
+> **Note:** This command downloads the latest `ControllerOverlay-Setup-*.exe` from GitHub Releases, installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates your shortcuts, and makes it easy to uninstall later.
+
+---
+
+Direct executable download:
+
+```text
+https://github.com/Catatatau/ControllerOverlay/releases/latest/download/ControllerOverlay-Setup-1.2.0.exe
+```
 
 ---
 

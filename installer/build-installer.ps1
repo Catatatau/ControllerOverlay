@@ -71,7 +71,7 @@ SEDVersion=3
 
 [Options]
 PackagePurpose=InstallApp
-ShowInstallProgramWindow=1
+ShowInstallProgramWindow=0
 HideExtractAnimation=1
 UseLongFileName=1
 InsideCompressed=0
@@ -83,7 +83,7 @@ DisplayLicense=
 FinishMessage=ControllerOverlay instalado com sucesso.
 TargetName=$installerPath
 FriendlyName=ControllerOverlay Setup
-AppLaunched=cmd /c install.cmd
+AppLaunched=powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File install.ps1
 PostInstallCmd=<None>
 AdminQuietInstCmd=
 UserQuietInstCmd=
