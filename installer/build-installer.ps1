@@ -2,7 +2,7 @@
 param(
     [string]$Configuration = 'Release',
     [string]$Runtime = 'win-x64',
-    [string]$Version = '1.2.0'
+    [string]$Version = '1.2.1'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -71,7 +71,7 @@ SEDVersion=3
 
 [Options]
 PackagePurpose=InstallApp
-ShowInstallProgramWindow=0
+ShowInstallProgramWindow=1
 HideExtractAnimation=1
 UseLongFileName=1
 InsideCompressed=0
@@ -83,7 +83,7 @@ DisplayLicense=
 FinishMessage=ControllerOverlay instalado com sucesso.
 TargetName=$installerPath
 FriendlyName=ControllerOverlay Setup
-AppLaunched=powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File install.ps1
+AppLaunched=install.cmd
 PostInstallCmd=<None>
 AdminQuietInstCmd=
 UserQuietInstCmd=

@@ -2,6 +2,7 @@
 param(
     [string]$SourceDir = $PSScriptRoot,
     [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\ControllerOverlay'),
+    [string]$Version = '1.2.1',
     [switch]$Launch
 )
 
@@ -106,7 +107,7 @@ New-Item -Path $uninstallKey -Force | Out-Null
 $estimatedSizeKb = [int][Math]::Ceiling((Get-Item -LiteralPath $targetExe).Length / 1KB)
 
 New-ItemProperty -Path $uninstallKey -Name 'DisplayName' -Value 'ControllerOverlay' -PropertyType String -Force | Out-Null
-New-ItemProperty -Path $uninstallKey -Name 'DisplayVersion' -Value '1.2.0' -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $uninstallKey -Name 'DisplayVersion' -Value $Version -PropertyType String -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'Publisher' -Value 'CATATAU' -PropertyType String -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'URLInfoAbout' -Value 'https://github.com/Catatatau/ControllerOverlay' -PropertyType String -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'InstallLocation' -Value $InstallDir -PropertyType String -Force | Out-Null

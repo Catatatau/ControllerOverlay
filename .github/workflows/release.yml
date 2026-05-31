@@ -25,6 +25,12 @@ jobs:
       shell: pwsh
       run: ./installer/build-installer.ps1
 
+    - name: Move latest tag to this commit
+      shell: pwsh
+      run: |
+        git tag -f latest $env:GITHUB_SHA
+        git push origin refs/tags/latest --force
+
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:

@@ -83,4 +83,9 @@ if ($process.ExitCode -ne 0) {
     throw "Installer exited with code $($process.ExitCode)."
 }
 
+$installedExe = Join-Path $env:LOCALAPPDATA 'Programs\ControllerOverlay\ControllerOverlay.exe'
+if (-not (Test-Path -LiteralPath $installedExe)) {
+    throw "Installer finished, but ControllerOverlay.exe was not found at $installedExe"
+}
+
 Write-Host 'ControllerOverlay installed successfully.' -ForegroundColor Green

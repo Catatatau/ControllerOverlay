@@ -50,7 +50,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.gith
 Direct executable download:
 
 ```text
-https://github.com/Catatatau/ControllerOverlay/releases/latest/download/ControllerOverlay-Setup-1.2.0.exe
+https://github.com/Catatatau/ControllerOverlay/releases/latest/download/ControllerOverlay-Setup-1.2.1.exe
 ```
 
 ---
