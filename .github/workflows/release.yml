@@ -37,5 +37,7 @@ jobs:
           irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex
         artifacts: "dist/ControllerOverlay-Setup-*.exe"
         allowUpdates: true
+        removeArtifacts: true
         replacesArtifacts: true
+        makeLatest: true
         token: ${{ secrets.GITHUB_TOKEN }}
