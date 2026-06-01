@@ -5,7 +5,7 @@
 *A standalone Windows executable controller overlay that displays Xbox, PlayStation, and generic controller inputs in real-time. Designed to be lightweight, modern, and transparent, sitting perfectly above Rocket League or any other game.*
 
 [![GitHub Release](https://img.shields.io/github/v/release/Catatatau/ControllerOverlay?style=for-the-badge&color=2ea44f)](https://github.com/Catatatau/ControllerOverlay/releases)
-[![Downloads](https://img.shields.io/github/downloads/Catatatau/ControllerOverlay/total?style=for-the-badge&label=Downloads&color=007ec6&cacheSeconds=300)](https://github.com/Catatatau/ControllerOverlay/releases)
+[![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FCatatatau%2FControllerOverlay%2Fmain%2Fbadges%2Fdownloads.json)](https://github.com/Catatatau/ControllerOverlay/releases)
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
