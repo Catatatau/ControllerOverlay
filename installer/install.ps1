@@ -2,7 +2,7 @@
 param(
     [string]$SourceDir = $PSScriptRoot,
     [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\ControllerOverlay'),
-    [string]$Version = '1.2.2',
+    [string]$Version = '1.2.3',
     [switch]$Launch
 )
 
@@ -11,7 +11,8 @@ $ErrorActionPreference = 'Stop'
 $appName = 'ControllerOverlay'
 $exeName = 'ControllerOverlay.exe'
 $sourceExe = Join-Path $SourceDir $exeName
-$targetExe = Join-Path $InstallDir $exeName
+$targetAppDir = $null
+$targetExe = $null
 
 function Stop-RunningApp {
     $processes = @(Get-Process -Name $appName -ErrorAction SilentlyContinue)
@@ -51,6 +52,31 @@ function Copy-FileWithRetry {
     }
 }
 
+function New-VersionedAppDirectory {
+    param(
+        [Parameter(Mandatory = $true)][string]$Root,
+        [Parameter(Mandatory = $true)][string]$VersionText
+    )
+
+    $safeVersion = $VersionText -replace '[^0-9A-Za-z_.-]', '_'
+    if ([string]::IsNullOrWhiteSpace($safeVersion)) {
+        $safeVersion = 'current'
+    }
+
+    $appDir = Join-Path $Root "app-$safeVersion"
+    if (Test-Path -LiteralPath $appDir) {
+        try {
+            Remove-Item -LiteralPath $appDir -Recurse -Force
+        }
+        catch {
+            $appDir = Join-Path $Root ("app-$safeVersion-" + (Get-Date -Format 'yyyyMMddHHmmss'))
+        }
+    }
+
+    New-Item -ItemType Directory -Path $appDir -Force | Out-Null
+    return $appDir
+}
+
 if (-not (Test-Path -LiteralPath $sourceExe)) {
     throw "Installer payload is missing $exeName in $SourceDir"
 }
@@ -58,10 +84,17 @@ if (-not (Test-Path -LiteralPath $sourceExe)) {
 Stop-RunningApp
 
 New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+$targetAppDir = New-VersionedAppDirectory -Root $InstallDir -VersionText $Version
+$targetExe = Join-Path $targetAppDir $exeName
 Copy-FileWithRetry -Source $sourceExe -Destination $targetExe
 
+$legacyRootExe = Join-Path $InstallDir $exeName
+if (Test-Path -LiteralPath $legacyRootExe) {
+    Remove-Item -LiteralPath $legacyRootExe -Force -ErrorAction SilentlyContinue
+}
+
 $sourceKeyboardsZip = Join-Path $SourceDir 'keyboards.zip'
-$targetKeyboardsDir = Join-Path $InstallDir 'keyboards'
+$targetKeyboardsDir = Join-Path $targetAppDir 'keyboards'
 if (Test-Path -LiteralPath $sourceKeyboardsZip) {
     $targetNohBoardDir = Join-Path $targetKeyboardsDir 'NohBoard'
     if (Test-Path -LiteralPath $targetNohBoardDir) {
@@ -130,8 +163,8 @@ $startMenuFolder = Join-Path ([Environment]::GetFolderPath('Programs')) 'Control
 $startMenuShortcut = Join-Path $startMenuFolder 'ControllerOverlay.lnk'
 $uninstallShortcut = Join-Path $startMenuFolder 'Uninstall ControllerOverlay.lnk'
 
-New-AppShortcut -ShortcutPath $desktopShortcut -TargetPath $targetExe -WorkingDirectory $InstallDir
-New-AppShortcut -ShortcutPath $startMenuShortcut -TargetPath $targetExe -WorkingDirectory $InstallDir
+New-AppShortcut -ShortcutPath $desktopShortcut -TargetPath $targetExe -WorkingDirectory $targetAppDir
+New-AppShortcut -ShortcutPath $startMenuShortcut -TargetPath $targetExe -WorkingDirectory $targetAppDir
 New-AppShortcut -ShortcutPath $uninstallShortcut -TargetPath 'powershell.exe' -WorkingDirectory $InstallDir -Description 'Uninstall ControllerOverlay'
 
 $shell = New-Object -ComObject WScript.Shell
@@ -154,6 +187,10 @@ New-ItemProperty -Path $uninstallKey -Name 'UninstallString' -Value "powershell.
 New-ItemProperty -Path $uninstallKey -Name 'EstimatedSize' -Value $estimatedSizeKb -PropertyType DWord -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'NoModify' -Value 1 -PropertyType DWord -Force | Out-Null
 New-ItemProperty -Path $uninstallKey -Name 'NoRepair' -Value 1 -PropertyType DWord -Force | Out-Null
+
+Get-ChildItem -LiteralPath $InstallDir -Directory -Filter 'app-*' -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -ne $targetAppDir } |
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
 Write-Host "ControllerOverlay installed in $InstallDir"
 

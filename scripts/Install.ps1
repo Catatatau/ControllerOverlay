@@ -18,7 +18,8 @@ else {
 
 $appName = 'ControllerOverlay'
 $exeName = 'ControllerOverlay.exe'
-$targetExe = Join-Path $InstallDir $exeName
+$targetAppDir = $null
+$targetExe = $null
 $tempRoot = Join-Path $env:TEMP 'ControllerOverlay'
 $tempDir = Join-Path $tempRoot ([Guid]::NewGuid().ToString('N'))
 
@@ -108,6 +109,31 @@ function Copy-FileWithRetry {
             Start-Sleep -Milliseconds (250 * $attempt)
         }
     }
+}
+
+function New-VersionedAppDirectory {
+    param(
+        [Parameter(Mandatory = $true)][string]$Root,
+        [Parameter(Mandatory = $true)][string]$VersionText
+    )
+
+    $safeVersion = $VersionText -replace '[^0-9A-Za-z_.-]', '_'
+    if ([string]::IsNullOrWhiteSpace($safeVersion)) {
+        $safeVersion = 'current'
+    }
+
+    $appDir = Join-Path $Root "app-$safeVersion"
+    if (Test-Path -LiteralPath $appDir) {
+        try {
+            Remove-Item -LiteralPath $appDir -Recurse -Force
+        }
+        catch {
+            $appDir = Join-Path $Root ("app-$safeVersion-" + (Get-Date -Format 'yyyyMMddHHmmss'))
+        }
+    }
+
+    New-Item -ItemType Directory -Path $appDir -Force | Out-Null
+    return $appDir
 }
 
 function New-AppShortcut {
@@ -221,9 +247,24 @@ try {
     Stop-RunningApp
 
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+    $downloadedVersion = (Get-Item -LiteralPath $tempExe).VersionInfo.ProductVersion
+    if ($downloadedVersion -match '^(\d+\.\d+\.\d+)') {
+        $installVersion = $Matches[1]
+    }
+    else {
+        $installVersion = ($release.tag_name -replace '^v', '')
+    }
+
+    $targetAppDir = New-VersionedAppDirectory -Root $InstallDir -VersionText $installVersion
+    $targetExe = Join-Path $targetAppDir $exeName
     Copy-FileWithRetry -Source $tempExe -Destination $targetExe
 
-    $targetKeyboardsDir = Join-Path $InstallDir 'keyboards'
+    $legacyRootExe = Join-Path $InstallDir $exeName
+    if (Test-Path -LiteralPath $legacyRootExe) {
+        Remove-Item -LiteralPath $legacyRootExe -Force -ErrorAction SilentlyContinue
+    }
+
+    $targetKeyboardsDir = Join-Path $targetAppDir 'keyboards'
     if (Test-Path -LiteralPath $tempKeyboardsZip) {
         $targetNohBoardDir = Join-Path $targetKeyboardsDir 'NohBoard'
         if (Test-Path -LiteralPath $targetNohBoardDir) {
@@ -255,8 +296,8 @@ Exemplo:
     $startMenuShortcut = Join-Path $startMenuFolder 'ControllerOverlay.lnk'
     $uninstallShortcut = Join-Path $startMenuFolder 'Uninstall ControllerOverlay.lnk'
 
-    New-AppShortcut -ShortcutPath $desktopShortcut -TargetPath $targetExe -WorkingDirectory $InstallDir
-    New-AppShortcut -ShortcutPath $startMenuShortcut -TargetPath $targetExe -WorkingDirectory $InstallDir
+    New-AppShortcut -ShortcutPath $desktopShortcut -TargetPath $targetExe -WorkingDirectory $targetAppDir
+    New-AppShortcut -ShortcutPath $startMenuShortcut -TargetPath $targetExe -WorkingDirectory $targetAppDir
     New-AppShortcut -ShortcutPath $uninstallShortcut -TargetPath 'powershell.exe' -WorkingDirectory $InstallDir -Description 'Uninstall ControllerOverlay'
 
     $shell = New-Object -ComObject WScript.Shell
@@ -275,6 +316,10 @@ Exemplo:
     if (-not (Test-Path -LiteralPath $targetExe)) {
         throw "Install failed. $exeName was not created at $targetExe"
     }
+
+    Get-ChildItem -LiteralPath $InstallDir -Directory -Filter 'app-*' -ErrorAction SilentlyContinue |
+        Where-Object { $_.FullName -ne $targetAppDir } |
+        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
     if (-not $NoLaunch) {
         Start-Process -FilePath $targetExe
