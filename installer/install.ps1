@@ -2,7 +2,7 @@
 param(
     [string]$SourceDir = $PSScriptRoot,
     [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'Programs\ControllerOverlay'),
-    [string]$Version = '1.2.1',
+    [string]$Version = '1.2.2',
     [switch]$Launch
 )
 
@@ -13,14 +13,52 @@ $exeName = 'ControllerOverlay.exe'
 $sourceExe = Join-Path $SourceDir $exeName
 $targetExe = Join-Path $InstallDir $exeName
 
+function Stop-RunningApp {
+    $processes = @(Get-Process -Name $appName -ErrorAction SilentlyContinue)
+    if ($processes.Count -eq 0) {
+        return
+    }
+
+    $ids = @($processes | Select-Object -ExpandProperty Id)
+    $processes | Stop-Process -Force -ErrorAction SilentlyContinue
+    foreach ($id in $ids) {
+        try {
+            Wait-Process -Id $id -Timeout 10 -ErrorAction SilentlyContinue
+        }
+        catch {
+        }
+    }
+}
+
+function Copy-FileWithRetry {
+    param(
+        [Parameter(Mandatory = $true)][string]$Source,
+        [Parameter(Mandatory = $true)][string]$Destination
+    )
+
+    for ($attempt = 1; $attempt -le 12; $attempt++) {
+        try {
+            Copy-Item -LiteralPath $Source -Destination $Destination -Force
+            return
+        }
+        catch {
+            if ($attempt -eq 12) {
+                throw
+            }
+
+            Start-Sleep -Milliseconds (250 * $attempt)
+        }
+    }
+}
+
 if (-not (Test-Path -LiteralPath $sourceExe)) {
     throw "Installer payload is missing $exeName in $SourceDir"
 }
 
-Get-Process -Name $appName -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Stop-RunningApp
 
 New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-Copy-Item -LiteralPath $sourceExe -Destination $targetExe -Force
+Copy-FileWithRetry -Source $sourceExe -Destination $targetExe
 
 $sourceKeyboardsZip = Join-Path $SourceDir 'keyboards.zip'
 $targetKeyboardsDir = Join-Path $InstallDir 'keyboards'

@@ -2,7 +2,7 @@
 param(
     [string]$Configuration = 'Release',
     [string]$Runtime = 'win-x64',
-    [string]$Version = '1.2.1'
+    [string]$Version = '1.2.2'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -55,6 +55,9 @@ if (-not (Test-Path -LiteralPath $keyboardsSource)) {
 
 Compress-Archive -Path (Join-Path $keyboardsSource '*') -DestinationPath $keyboardsZip -Force
 
+Copy-Item -LiteralPath $exePath -Destination (Join-Path $distDir 'ControllerOverlay.exe') -Force
+Copy-Item -LiteralPath $keyboardsZip -Destination (Join-Path $distDir 'keyboards.zip') -Force
+
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install.ps1') -Destination (Join-Path $payloadDir 'install.ps1') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install.cmd') -Destination (Join-Path $payloadDir 'install.cmd') -Force
 
@@ -80,7 +83,7 @@ CAB_ResvCodeSigning=0
 RebootMode=N
 InstallPrompt=
 DisplayLicense=
-FinishMessage=ControllerOverlay instalado com sucesso.
+FinishMessage=
 TargetName=$installerPath
 FriendlyName=ControllerOverlay Setup
 AppLaunched=install.cmd

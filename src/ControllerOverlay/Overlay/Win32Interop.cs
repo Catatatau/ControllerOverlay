@@ -6,7 +6,7 @@ namespace ControllerOverlay.Overlay
     public static class Win32Interop
     {
         public const int WS_EX_TRANSPARENT = 0x00000020;
-        public const int WS_EX_LAYERED = 0x00000080;
+        public const int WS_EX_LAYERED = 0x00080000;
         public const int WS_EX_TOOLWINDOW = 0x00000080;
         public const int GWL_EXSTYLE = -20;
 

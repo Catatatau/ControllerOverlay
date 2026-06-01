@@ -56,15 +56,21 @@ namespace ControllerOverlay
                 "ControllerOverlay",
                 "keyboards");
 
-            Directory.CreateDirectory(root);
-
-            string readmePath = Path.Combine(root, "README.txt");
-            if (!File.Exists(readmePath))
+            try
             {
-                File.WriteAllText(
-                    readmePath,
-                    "Coloque aqui pastas de teclado no formato NohBoard. Cada modelo precisa ter um arquivo keyboard.json.\r\n" +
-                    "Exemplo: %APPDATA%\\ControllerOverlay\\keyboards\\MeuModelo\\keyboard.json\r\n");
+                Directory.CreateDirectory(root);
+
+                string readmePath = Path.Combine(root, "README.txt");
+                if (!File.Exists(readmePath))
+                {
+                    File.WriteAllText(
+                        readmePath,
+                        "Coloque aqui pastas de teclado no formato NohBoard. Cada modelo precisa ter um arquivo keyboard.json.\r\n" +
+                        "Exemplo: %APPDATA%\\ControllerOverlay\\keyboards\\MeuModelo\\keyboard.json\r\n");
+                }
+            }
+            catch
+            {
             }
 
             return root;

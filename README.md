@@ -43,14 +43,14 @@ Or from CMD:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Catatatau/ControllerOverlay/main/scripts/Install.ps1 | iex"
 ```
 
-> **Note:** This command downloads the latest `ControllerOverlay-Setup-*.exe` from GitHub Releases, installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates your shortcuts, and makes it easy to uninstall later.
+> **Note:** This command downloads the latest `ControllerOverlay.exe` from GitHub Releases, installs the app to `%LOCALAPPDATA%\Programs\ControllerOverlay`, creates your shortcuts, and makes it easy to uninstall later.
 
 ---
 
 Direct executable download:
 
 ```text
-https://github.com/Catatatau/ControllerOverlay/releases/latest/download/ControllerOverlay-Setup-1.2.1.exe
+https://github.com/Catatatau/ControllerOverlay/releases/latest/download/ControllerOverlay.exe
 ```
 
 ---
