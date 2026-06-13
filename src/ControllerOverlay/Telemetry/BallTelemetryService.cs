@@ -18,6 +18,7 @@ namespace ControllerOverlay.Telemetry
         public double? BallSpeedKph { get; private set; }
         public DateTime LastUpdateUtc { get; private set; } = DateTime.MinValue;
         public string LastError { get; private set; } = string.Empty;
+        public event Action? Updated;
 
         public void Start(int port)
         {
@@ -50,6 +51,8 @@ namespace ControllerOverlay.Telemetry
             _cts?.Dispose();
             _client = null;
             _cts = null;
+            BallSpeedKph = null;
+            LastUpdateUtc = DateTime.MinValue;
         }
 
         private async Task ReceiveLoop(CancellationToken token)
@@ -66,6 +69,7 @@ namespace ControllerOverlay.Telemetry
                         BallSpeedKph = speedKph;
                         LastUpdateUtc = DateTime.UtcNow;
                         LastError = string.Empty;
+                        Updated?.Invoke();
                     }
                 }
                 catch (OperationCanceledException)
@@ -93,10 +97,18 @@ namespace ControllerOverlay.Telemetry
             try
             {
                 JObject json = JObject.Parse(payload);
+                JToken? data = NormalizeDataToken(json["Data"]);
+                JToken? game = data?["Game"] ?? data;
                 JToken? token = json["ballSpeedKph"] ??
                                 json["ball_speed_kph"] ??
                                 json["ballSpeed"] ??
-                                json["speed"];
+                                json["speed"] ??
+                                json["BallSpeed"] ??
+                                game?["BallSpeed"] ??
+                                game?["ballSpeed"] ??
+                                game?["Ball"]?["Speed"] ??
+                                game?["Ball"]?["speed"] ??
+                                game?["Ball"]?["Physics"]?["Speed"];
 
                 if (token == null)
                 {
@@ -110,6 +122,34 @@ namespace ControllerOverlay.Telemetry
             {
                 speedKph = 0;
                 return false;
+            }
+        }
+
+        private static JToken? NormalizeDataToken(JToken? token)
+        {
+            if (token == null)
+            {
+                return null;
+            }
+
+            if (token.Type != JTokenType.String)
+            {
+                return token;
+            }
+
+            string? text = token.Value<string>();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return null;
+            }
+
+            try
+            {
+                return JToken.Parse(text);
+            }
+            catch
+            {
+                return null;
             }
         }
 

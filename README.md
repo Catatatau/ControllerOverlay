@@ -24,7 +24,7 @@
 - ⌨️ **Global Hotkeys**: Easily hide or tweak the overlay mid-game without alt-tabbing.
 - 📊 **HUD Metrics**: Optional FPS and ball speed readout.
 - 🔄 **Smart Game FPS Source**: Reads game FPS from RTSS/RivaTuner shared memory when available, with ETW and local Stats API fallback.
-- ⚽ **Safe Ball Telemetry**: Ball speed can be received from a local TCP/WebSocket Stats API source without reading game memory.
+- ⚽ **Safe Ball Telemetry**: Ball speed can be received from a local UDP, TCP, or WebSocket Stats API source without reading game memory.
 - 🖐️ **Movable HUD**: Drag the FPS/ball speed panel freely when click-through is disabled.
 
 ---
@@ -89,7 +89,7 @@ Settings are automatically saved to your `%APPDATA%\ControllerOverlay\settings.j
 ## 📡 Advanced: Telemetry & FPS
 
 ### Ball Speed Telemetry
-The overlay does not read or hook game memory. To show ball speed, provide a local TCP or WebSocket Stats API server on the configured port (default `49123`).
+The overlay does not read or hook game memory. To show ball speed, provide a local UDP packet source or TCP/WebSocket Stats API server on the configured port (default `49123`).
 
 Supported payload format:
 ```json

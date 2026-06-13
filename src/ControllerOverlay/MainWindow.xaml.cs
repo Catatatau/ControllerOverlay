@@ -7,6 +7,7 @@ using ControllerOverlay.Input;
 using ControllerOverlay.Overlay;
 using ControllerOverlay.Settings;
 using ControllerOverlay.Telemetry;
+using System.Windows.Threading;
 
 namespace ControllerOverlay
 {
@@ -20,8 +21,10 @@ namespace ControllerOverlay
         private SettingsWindow? _settingsWindow;
         private FpsHudWindow? _fpsWindow;
         private RocketLeagueStatsApiService _gameStatsService = null!;
+        private BallTelemetryService _ballTelemetryService = null!;
         private EtwGameFpsReader _etwFpsReader = null!;
         private KeyboardMouseManager _kbmManager = null!;
+        private DispatcherTimer _statsRefreshTimer = null!;
 
         private DateTime _lastStatsUpdate = DateTime.MinValue;
         private int _activeStatsApiPort;
@@ -38,7 +41,14 @@ namespace ControllerOverlay
 
             _overlayBehavior = new OverlayBehavior(this);
             _gameStatsService = new RocketLeagueStatsApiService();
+            _ballTelemetryService = new BallTelemetryService();
+            _ballTelemetryService.Updated += Telemetry_Updated;
             _etwFpsReader = new EtwGameFpsReader();
+            _statsRefreshTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(250)
+            };
+            _statsRefreshTimer.Tick += (_, _) => UpdateStatsHud();
 
             EnsureFpsWindow();
 
@@ -183,13 +193,30 @@ namespace ControllerOverlay
             if (!settings.ShowFps && !settings.ShowBallSpeed)
             {
                 _gameStatsService.Stop();
+                _ballTelemetryService.Stop();
+                _statsRefreshTimer.Stop();
                 return;
             }
 
-            if (_activeStatsApiPort != settings.FpsUdpPort || !_gameStatsService.IsRunning)
+            bool statsPortChanged = _activeStatsApiPort != settings.FpsUdpPort;
+            if (statsPortChanged || !_gameStatsService.IsRunning)
             {
                 _activeStatsApiPort = settings.FpsUdpPort;
                 _gameStatsService.Start(settings.FpsUdpPort);
+            }
+
+            if (settings.ShowBallSpeed && (statsPortChanged || !_ballTelemetryService.IsRunning))
+            {
+                _ballTelemetryService.Start(settings.FpsUdpPort);
+            }
+            else if (!settings.ShowBallSpeed)
+            {
+                _ballTelemetryService.Stop();
+            }
+
+            if (!_statsRefreshTimer.IsEnabled)
+            {
+                _statsRefreshTimer.Start();
             }
 
             if (settings.ShowFps)
@@ -279,7 +306,18 @@ namespace ControllerOverlay
                 return $"Bola: {_gameStatsService.BallSpeedUus.Value:0} km/h";
             }
 
+            if (_ballTelemetryService.BallSpeedKph.HasValue &&
+                (DateTime.UtcNow - _ballTelemetryService.LastUpdateUtc).TotalSeconds <= 2.0)
+            {
+                return $"Bola: {_ballTelemetryService.BallSpeedKph.Value:0} km/h";
+            }
+
             return "Bola: N/D";
+        }
+
+        private void Telemetry_Updated()
+        {
+            Dispatcher.InvokeAsync(() => UpdateStatsHud(force: true));
         }
 
         private void ToggleOverlay()
@@ -341,7 +379,9 @@ namespace ControllerOverlay
             _kbmManager?.Dispose();
             _hotkeyService?.Dispose();
             _gameStatsService?.Dispose();
+            _ballTelemetryService?.Dispose();
             _etwFpsReader?.Dispose();
+            _statsRefreshTimer?.Stop();
             _fpsWindow?.Close();
             Application.Current.Shutdown();
         }
