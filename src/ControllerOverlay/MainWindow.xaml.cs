@@ -44,7 +44,7 @@ namespace ControllerOverlay
 
             _hotkeyService = new GlobalHotkeyService(this);
             _hotkeyService.RegisterHotkey(6, 0x4F, ToggleOverlay); // Ctrl+Shift+O
-            _hotkeyService.RegisterHotkey(6, 0x43, ToggleSettings); // Ctrl+Shift+C
+            _hotkeyService.RegisterHotkey(0, 0x71, ToggleSettings); // F2
 
             _controllerManager = new ControllerManager();
             _controllerManager.SetWindowHandle(new WindowInteropHelper(this).Handle);

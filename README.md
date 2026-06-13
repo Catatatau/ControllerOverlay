@@ -62,7 +62,7 @@ https://github.com/Catatatau/ControllerOverlay/releases/latest/download/Controll
 3. Run `ControllerOverlay.exe` from your Desktop.
 4. Connect your controller (hot-plugging is fully supported).
 5. Position the overlay where you like it by clicking and dragging (make sure "Lock Position" is off).
-6. Press `Ctrl + Shift + C` to open the settings panel and customize your experience.
+6. Press `F2` to open the settings panel and customize your experience.
 7. Enjoy!
 
 ---
@@ -72,7 +72,7 @@ https://github.com/Catatatau/ControllerOverlay/releases/latest/download/Controll
 | Shortcut | Action |
 | --- | --- |
 | `Ctrl + Shift + O` | 👁️ Show/Hide Overlay |
-| `Ctrl + Shift + C` | ⚙️ Open Settings Window |
+| `F2` | ⚙️ Open Settings Window |
 
 ---
 
@@ -113,7 +113,7 @@ Supported Stats API payload format for FPS:
 - **My controller is not detected:**  
   If you are using a PlayStation controller, ensure it's recognized by Windows. If it acts erratically, using [DS4Windows](https://ds4-windows.com/) will provide perfect XInput translation.
 - **I can't click the settings gear:**  
-  If "Click-Through" is enabled, you cannot click the overlay. Use `Ctrl + Shift + C` to open settings and disable click-through.
+  If "Click-Through" is enabled, you cannot click the overlay. Use `F2` to open settings and disable click-through.
 
 ---
 

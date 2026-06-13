@@ -54,7 +54,7 @@ jobs:
             - Pasta do usuario para adicionar novos modelos keyboard.json.
             - Roda de cores livre para escolher qualquer cor do overlay.
             - HUD separado para FPS e velocidade da bola.
-            - Painel de configuracoes em Ctrl+Shift+C.
+            - Painel de configuracoes em F2.
             - Opcoes para escala, transparencia, click-through e posicao do HUD.
             - Instalador Windows com atalhos e desinstalador.
 
