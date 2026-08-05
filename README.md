@@ -1,6 +1,6 @@
 <div align="center">
   
-# 🎮 Controller Overlay for Rocket League
+# Controller Overlay for Rocket League
 
 *A standalone Windows executable controller overlay that displays Xbox, PlayStation, and generic controller inputs in real-time. Designed to be lightweight, modern, and transparent, sitting perfectly above Rocket League or any other game.*
 
@@ -13,23 +13,23 @@
 
 ---
 
-## ✨ Features
+## Features
 
-- 🚀 **Standalone `.exe`**: Portable and lightweight, requiring no installation dependencies.
-- 📦 **One-Click Installer**: Automatically sets up the app, adds shortcuts to your Desktop/Start Menu, and registers an uninstaller.
-- 📌 **Always on Top**: Works perfectly over games running in Borderless Windowed or Windowed mode.
-- 👻 **Click-Through Mode**: Play your game seamlessly without accidentally interacting with the overlay.
-- 🎮 **Multi-Controller Support**: Native support for XInput (Xbox) and DirectInput (PlayStation DualShock/DualSense and Generic).
-- 🎨 **Customizable UI**: Choose between Xbox and PlayStation layouts, adjust themes, scale, opacity, deadzone, and accent colors.
-- ⌨️ **Global Hotkeys**: Easily hide or tweak the overlay mid-game without alt-tabbing.
-- 📊 **HUD Metrics**: Optional FPS and ball speed readout.
-- 🔄 **Smart Game FPS Source**: Reads game FPS from RTSS/RivaTuner shared memory when available, with ETW and local Stats API fallback.
-- ⚽ **Safe Ball Telemetry**: Ball speed can be received from a local UDP, TCP, or WebSocket Stats API source without reading game memory.
-- 🖐️ **Movable HUD**: Drag the FPS/ball speed panel freely when click-through is disabled.
+- **Standalone `.exe`**: Portable and lightweight, requiring no installation dependencies.
+- **One-Click Installer**: Automatically sets up the app, adds shortcuts to your Desktop/Start Menu, and registers an uninstaller.
+- **Always on Top**: Works perfectly over games running in Borderless Windowed or Windowed mode.
+- **Click-Through Mode**: Play your game seamlessly without accidentally interacting with the overlay.
+- **Multi-Controller Support**: Native support for XInput (Xbox) and DirectInput (PlayStation DualShock/DualSense and Generic).
+- **Customizable UI**: Choose between Xbox and PlayStation layouts, adjust themes, scale, opacity, deadzone, and accent colors.
+- **Global Hotkeys**: Easily hide or tweak the overlay mid-game without alt-tabbing.
+- **HUD Metrics**: Optional FPS and ball speed readout.
+- **Smart Game FPS Source**: Reads game FPS from RTSS/RivaTuner shared memory when available, with ETW and local Stats API fallback.
+- **Safe Ball Telemetry**: Ball speed can be received from a local UDP, TCP, or WebSocket Stats API source without reading game memory.
+- **Movable HUD**: Drag the FPS/ball speed panel freely when click-through is disabled.
 
 ---
 
-## ⚡ Installation
+## Installation
 
 To install **ControllerOverlay** on any computer, simply run the following command in PowerShell:
 
@@ -55,7 +55,7 @@ https://github.com/Catatatau/ControllerOverlay/releases/latest/download/Controll
 
 ---
 
-## 🕹️ How to Use with Rocket League
+## How to Use with Rocket League
 
 1. Launch **Rocket League**.
 2. Go to **Settings -> Video** and set your Display Mode to **Borderless** or **Windowed**. *(Exclusive Fullscreen prevents external overlays from rendering on top).*
@@ -67,16 +67,16 @@ https://github.com/Catatatau/ControllerOverlay/releases/latest/download/Controll
 
 ---
 
-## ⌨️ Default Hotkeys
+## Default Hotkeys
 
 | Shortcut | Action |
 | --- | --- |
-| `Ctrl + Shift + O` | 👁️ Show/Hide Overlay |
-| `F2` | ⚙️ Open Settings Window |
+| `Ctrl + Shift + O` | Show/Hide Overlay |
+| `F2` | Open Settings Window |
 
 ---
 
-## ⚙️ Settings & Configuration
+## Settings & Configuration
 
 Settings are automatically saved to your `%APPDATA%\ControllerOverlay\settings.json` file.
 
@@ -86,7 +86,7 @@ Settings are automatically saved to your `%APPDATA%\ControllerOverlay\settings.j
 
 ---
 
-## 📡 Advanced: Telemetry & FPS
+## Advanced: Telemetry & FPS
 
 ### Ball Speed Telemetry
 The overlay does not read or hook game memory. To show ball speed, provide a local UDP packet source or TCP/WebSocket Stats API server on the configured port (default `49123`).
@@ -106,7 +106,7 @@ Supported Stats API payload format for FPS:
 
 ---
 
-## ❓ Troubleshooting & Anti-Cheat
+## Troubleshooting & Anti-Cheat
 
 - **Is this a cheat?**  
   **No.** This app only reads physical controller inputs from Windows natively using `XInput` and `DirectInput`. It does **not** hook into game memory, read game files, or interact with Rocket League in any way. It is completely safe to use.
@@ -117,7 +117,7 @@ Supported Stats API payload format for FPS:
 
 ---
 
-## 🛠️ Build Instructions (Developers)
+## Build Instructions (Developers)
 
 Requires **.NET 8.0 SDK**. Run the following command to generate a portable standalone executable:
 
@@ -129,5 +129,5 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 
 <div align="center">
   <br/>
-  Made with ❤️ by Catatau
+  Made with by Catatau
 </div>
